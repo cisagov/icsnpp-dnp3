@@ -4,9 +4,9 @@ Industrial Control Systems Network Protocol Parsers (ICSNPP) - DNP3.
 
 ## Overview
 
-ICSNPP-Modbus is a Zeek package that extends the logging capabilities of Zeek's default DNP3 protocol parser.
+ICSNPP-DNP3 is a Zeek package that extends the logging capabilities of Zeek's default DNP3 protocol parser.
 
-Zeek's default DNP3 parser logs DNP3 traffic to dnp3.log. This log file remains unchanged. This package extends Modbus logging capability by adding two new Modbus log files:
+Zeek's default DNP3 parser logs DNP3 traffic to dnp3.log. This log file remains unchanged. This package extends DNP3 logging capability by adding two new DNP3 log files:
 * dnp3_control.log
 * dnp3_objects.log
 
@@ -35,7 +35,7 @@ zeek -Cr icsnpp-dnp3/examples/dnp3_example.pcap icsnpp-dnp3
 
 ### Manual Install
 
-To install this script manually, clone this repository and copy the contents of the scripts directory into `${ZEEK_INSTALLATION_DIR}/share/zeek/site/icsnpp-modbus`.
+To install this script manually, clone this repository and copy the contents of the scripts directory into `${ZEEK_INSTALLATION_DIR}/share/zeek/site/icsnpp-dnp3`.
 
 ```bash
 git clone https://github.com/cisagov/icsnpp-dnp3.git
