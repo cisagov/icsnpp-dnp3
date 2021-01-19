@@ -1,0 +1,8 @@
+[package]
+script_dir = scripts
+description = DNP3 script for detailed logging of the DNP3 protocol - CISA ICSNPP
+credits = Stephen Kleinheider <stephen.kleinheider@inl.gov>
+tags =  dnp3, DNP3, ics, ICS, CISA, INL, ICSNPP, icsnpp, zeek scripting, log writer, protocol analyzer
+depends =
+  zkg >=2.0
+  zeek >=3.0.0
