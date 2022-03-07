@@ -12,7 +12,7 @@ Zeek's default DNP3 parser logs DNP3 traffic to dnp3.log. This log file remains 
 
 For additional information on these log files, see the *Logging Capabilities* section below.
 
-## Installation 
+## Installation
 
 ### Package Manager
 
@@ -30,7 +30,7 @@ If you are not using site/local.zeek or another site installation of Zeek and ju
 
 ```bash
 git clone https://github.com/cisagov/icsnpp-dnp3.git
-zeek -Cr icsnpp-dnp3/examples/dnp3_example.pcap icsnpp-dnp3
+zeek -Cr icsnpp-dnp3/tests/traces/dnp3_example.pcap icsnpp-dnp3
 ```
 
 ### Manual Install
@@ -48,7 +48,7 @@ If you are using a site deployment, simply add echo `@load icsnpp-dnp3` to your 
 If you are not using site/local.zeek or another site installation of Zeek and just want to run this package on a packet capture you can add `icsnpp-dnp3` to your command to run this plugin's scripts on the packet capture:
 
 ```bash
-zeek -Cr icsnpp-dnp3/examples/dnp3_example.pcap icsnpp-dnp3
+zeek -Cr icsnpp-dnp3/tests/traces/dnp3_example.pcap icsnpp-dnp3
 ```
 ## Logging Capabilities
 
