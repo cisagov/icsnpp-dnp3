@@ -1,4 +1,4 @@
-# @TEST-EXEC: zeek -C -r ${TRACES}/dnp3_example.pcap %PACKAGE
+# @TEST-EXEC: zeek -C -r ${TRACES}/dnp3_example.pcap $PACKAGE %INPUT
 # @TEST-EXEC: btest-diff conn.log
 # @TEST-EXEC: btest-diff dnp3.log
 # @TEST-EXEC: btest-diff dnp3_control.log
