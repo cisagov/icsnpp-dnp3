@@ -29,7 +29,7 @@ else
         # Combine the local tree and the system-wide path. This allows
         # us to test on a local build or an installation made via zkg,
         # which squirrels away the build. --cpk
-        echo "$(cd ${base}/../.. && pwd):$(zeek-config --plugin_dir)"
+        echo "$(cd ${base}/../.. && pwd)"
     elif [ "$1" = "path" ]; then
         echo ${PATH}
     else
