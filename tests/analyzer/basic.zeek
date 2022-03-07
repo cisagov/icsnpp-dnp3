@@ -5,4 +5,4 @@
 # @TEST-EXEC: btest-diff dnp3_objects.log
 #
 # @TEST-DOC: Test DNP3 analyzer extennsions with small trace.
-
+@load packages
