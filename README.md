@@ -64,20 +64,25 @@ This log file contains all the relevant data for these SELECT and OPERATE comman
 
 #### Fields Captured:
 
-| Field                 | Type      | Description                                               |
-| --------------------- |-----------|-----------------------------------------------------------|
-| ts                    | time      | Timestamp                                                 |
-| uid                   | string    | Unique ID for this connection                             |
-| id                    | conn_id   | Default Zeek connection info (IP addresses, ports)        |
-| block_type            | string    | Control_Relay_Output_Block or Pattern_Control_Block       |
-| function_code         | string    | Function Code (SELECT, OPERATE, RESPONSE)                 |
-| index_number          | count     | Object Index #                                            |
-| trip_control_code     | string    | Nul, Close, or Trip                                       |
-| operation_type        | string    | Nul, Pulse_On, Pulse_Off, Latch_On, Latch_Off             |
-| execute_count         | count     | Number of times to execute                                |
-| on_time               | count     | On Time                                                   |
-| off_time              | count     | Off Time                                                  |
-| status_code           | string    | Status Code                                               |
+| Field                 | Type      | Description                                                   |
+| --------------------- |-----------|---------------------------------------------------------------|
+| ts                    | time      | Timestamp                                                     |
+| uid                   | string    | Unique ID for this connection                                 |
+| id                    | conn_id   | Default Zeek connection info (IP addresses, ports)            |
+| is_orig               | bool      | True if the packet is sent from the originator                |
+| source_h              | address   | Source IP address (see *Source and Destination Fields*)       |
+| source_p              | port      | Source Port (see *Source and Destination Fields*)             |
+| destination_h         | address   | Destination IP address (see *Source and Destination Fields*)  |
+| destination_p         | port      | Destination Port (see *Source and Destination Fields*)        |
+| block_type            | string    | Control_Relay_Output_Block or Pattern_Control_Block           |
+| function_code         | string    | Function Code (SELECT, OPERATE, RESPONSE)                     |
+| index_number          | count     | Object Index #                                                |
+| trip_control_code     | string    | Nul, Close, or Trip                                           |
+| operation_type        | string    | Nul, Pulse_On, Pulse_Off, Latch_On, Latch_Off                 |
+| execute_count         | count     | Number of times to execute                                    |
+| on_time               | count     | On Time                                                       |
+| off_time              | count     | Off Time                                                      |
+| status_code           | string    | Status Code                                                   |
 
 ### DNP3 Read Object Log (dnp3_read_objects.log)
 
@@ -89,16 +94,65 @@ DNP3 READ-RESPONSE commands are very common DNP3 commands and these responses co
 
 #### Fields Captured
 
-| Field                 | Type      | Description                                           |
-| --------------------- |-----------|-------------------------------------------------------|
-| ts                    | time      | Timestamp                                             |
-| uid                   | string    | Unique ID for this connection                         |
-| id                    | conn_id   | Default Zeek connection info (IP addresses, ports)    |
-| function_code         | string    | Function Code (READ or RESPONSE)                      |
-| object_type           | string    | DNP3 Object type                                      |
-| object_count          | count     | Number of objects                                     |
-| range_low             | count     | Range (Low) of object                                 |
-| range_high            | count     | Range (High) of object                                |
+| Field                 | Type      | Description                                                   |
+| --------------------- |-----------|---------------------------------------------------------------|
+| ts                    | time      | Timestamp                                                     |
+| uid                   | string    | Unique ID for this connection                                 |
+| id                    | conn_id   | Default Zeek connection info (IP addresses, ports)            |
+| is_orig               | bool      | True if the packet is sent from the originator                |
+| source_h              | address   | Source IP address (see *Source and Destination Fields*)       |
+| source_p              | port      | Source Port (see *Source and Destination Fields*)             |
+| destination_h         | address   | Destination IP address (see *Source and Destination Fields*)  |
+| destination_p         | port      | Destination Port (see *Source and Destination Fields*)        |
+| function_code         | string    | Function Code (READ or RESPONSE)                              |
+| object_type           | string    | DNP3 Object type                                              |
+| object_count          | count     | Number of objects                                             |
+| range_low             | count     | Range (Low) of object                                         |
+| range_high            | count     | Range (High) of object                                        |
+
+### Source and Destination Fields
+
+#### Overview
+
+Zeek's typical behavior is to focus on and log packets from the originator and not log packets from the responder. However, most ICS protocols contain useful information in the responses, so the ICSNPP parsers log both originator and responses packets. Zeek's default behavior, defined in its `id` struct, is to never switch these originator/responder roles which leads to inconsistencies and inaccuracies when looking at ICS traffic that logs responses.
+
+The default Zeek `id` struct contains the following logged fields:
+* id.orig_h (Original Originator/Source Host)
+* id.orig_p (Original Originator/Source Port)
+* id.resp_h (Original Responder/Destination Host)
+* id.resp_p (Original Responder/Destination Port)
+
+Additionally, the `is_orig` field is a boolean field that is set to T (True) when the id_orig fields are the true originators/source and F (False) when the id_resp fields are the true originators/source.
+
+To not break existing platforms that utilize the default `id` struct and `is_orig` field functionality, the ICSNPP team has added four new fields to each log file instead of changing Zeek's default behavior. These four new fields provide the accurate information regarding source and destination IP addresses and ports:
+* source_h (True Originator/Source Host)
+* source_p (True Originator/Source Port)
+* destination_h (True Responder/Destination Host)
+* destination_p (True Responder/Destination Port)
+
+The pseudocode below shows the relationship between the `id` struct, `is_orig` field, and the new `source` and `destination` fields.
+
+```
+if is_orig == True
+    source_h == id.orig_h
+    source_p == id.orig_p
+    destination_h == id.resp_h
+    destination_p == id.resp_p
+if is_orig == False
+    source_h == id.resp_h
+    source_p == id.resp_p
+    destination_h == id.orig_h
+    destination_p == id.orig_p
+```
+
+#### Example
+
+The table below shows an example of these fields in the log files. The first log in the table represents a Modbus request from 192.168.1.10 -> 192.168.1.200 and the second log represents a Modbus reply from 192.168.1.200 -> 192.168.1.10. As shown in the table below, the `id` structure lists both packets as having the same originator and responder, but the `source` and `destination` fields reflect the true source and destination of these packets.
+
+| id.orig_h    | id.orig_p | id.resp_h     | id.resp_p | is_orig | source_h      | source_p | destination_h | destination_p |
+| ------------ | --------- |---------------|-----------|---------|---------------|----------|---------------|-------------- |
+| 192.168.1.10 | 47785     | 192.168.1.200 | 502       | T       | 192.168.1.10  | 47785    | 192.168.1.200 | 502           |
+| 192.168.1.10 | 47785     | 192.168.1.200 | 502       | F       | 192.168.1.200 | 502      | 192.168.1.10  | 47785         |
 
 ## ICSNPP Packages
 

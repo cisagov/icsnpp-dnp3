@@ -21,6 +21,11 @@ export {
         ts                      : time      &log;             # Timestamp of event
         uid                     : string    &log;             # Zeek unique ID for connection
         id                      : conn_id   &log;             # Zeek connection struct (addresses and ports)
+        is_orig                 : bool      &optional &log;   # the message came from the originator/client or the responder/server
+        source_h                : addr      &optional &log;   # Source IP Address
+        source_p                : port      &optional &log;   # Source Port
+        destination_h           : addr      &optional &log;   # Destination IP Address
+        destination_p           : port      &optional &log;   # Destination Port
         block_type              : string    &optional &log;   # Control_Relay_Output_Block or Pattern_Control_Block
         function_code           : string    &optional &log;   # Function Code (SELECT, OPERATE, RESPONSE)
         index_number            : count     &optional &log;   # Object Index #
@@ -40,11 +45,16 @@ export {
         ts                      : time      &log;             # Timestamp of event
         uid                     : string    &log;             # Zeek unique ID for connection
         id                      : conn_id   &log;             # Zeek connection struct (addresses and ports)
-        function_code           : string    &optional &log;             # Function Code (READ or RESPONSE)
-        object_type             : string    &optional &log;             # Object type (see dnp3_objects)
-        object_count            : count     &optional &log;             # Number of objects
-        range_low               : count     &optional &log;             # Range (Low) of object
-        range_high              : count     &optional &log;             # Range (High) of object
+        is_orig                 : bool      &optional &log;   # the message came from the originator/client or the responder/server
+        source_h                : addr      &optional &log;   # Source IP Address
+        source_p                : port      &optional &log;   # Source Port
+        destination_h           : addr      &optional &log;   # Destination IP Address
+        destination_p           : port      &optional &log;   # Destination Port
+        function_code           : string    &optional &log;   # Function Code (READ or RESPONSE)
+        object_type             : string    &optional &log;   # Object type (see dnp3_objects)
+        object_count            : count     &optional &log;   # Number of objects
+        range_low               : count     &optional &log;   # Range (Low) of object
+        range_high              : count     &optional &log;   # Range (High) of object
     };
     global log_objects: event(rec: Objects);
 }
@@ -131,6 +141,22 @@ event dnp3_crob(c: connection,
 
     if ( ! c?$dnp3_control )
         c$dnp3_control = [$ts=network_time(), $uid=c$uid, $id=c$id];
+    
+    c$dnp3_control$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        c$dnp3_control$source_h = c$id$orig_h;
+        c$dnp3_control$source_p = c$id$orig_p;
+        c$dnp3_control$destination_h = c$id$resp_h;
+        c$dnp3_control$destination_p = c$id$resp_p;
+    }else
+    {
+        c$dnp3_control$source_h = c$id$resp_h;
+        c$dnp3_control$source_p = c$id$resp_p;
+        c$dnp3_control$destination_h = c$id$orig_h;
+        c$dnp3_control$destination_p = c$id$orig_p;
+    }
 
     c$dnp3_control$block_type = "Control Relay Output Block";
     c$dnp3_control$trip_control_code = control_block_trip_code[((control_code & 0xc0)/64)];
@@ -138,8 +164,7 @@ event dnp3_crob(c: connection,
     c$dnp3_control$execute_count = count8;
     c$dnp3_control$on_time = on_time;
     c$dnp3_control$off_time = off_time;
-    c$dnp3_control$status_code = control_block_status_codes[status_code];
-    
+    c$dnp3_control$status_code = control_block_status_codes[status_code];    
 
     Log::write(LOG_CONTROL, c$dnp3_control);
 
@@ -161,6 +186,22 @@ event dnp3_pcb(c: connection,
 
     if ( ! c?$dnp3_control )
         c$dnp3_control = [$ts=network_time(), $uid=c$uid, $id=c$id];
+    
+    c$dnp3_control$is_orig  = is_orig;
+
+    if(is_orig)
+    {
+        c$dnp3_control$source_h = c$id$orig_h;
+        c$dnp3_control$source_p = c$id$orig_p;
+        c$dnp3_control$destination_h = c$id$resp_h;
+        c$dnp3_control$destination_p = c$id$resp_p;
+    }else
+    {
+        c$dnp3_control$source_h = c$id$resp_h;
+        c$dnp3_control$source_p = c$id$resp_p;
+        c$dnp3_control$destination_h = c$id$orig_h;
+        c$dnp3_control$destination_p = c$id$orig_p;
+    }
 
     c$dnp3_control$block_type = "Pattern Control Block";
     c$dnp3_control$trip_control_code = control_block_trip_code[((control_code & 0xc0)/64)];
@@ -202,16 +243,25 @@ event dnp3_object_header(c: connection,
     dnp3_object$ts  = network_time();
     dnp3_object$uid = c$uid;
     dnp3_object$id  = c$id;
+    dnp3_object$is_orig  = is_orig;
 
     dnp3_object$object_type = device_type;
     
     if ( is_orig ){
         dnp3_object$function_code = c$dnp3_objects$function_code;
+        dnp3_object$source_h = c$id$orig_h;
+        dnp3_object$source_p = c$id$orig_p;
+        dnp3_object$destination_h = c$id$resp_h;
+        dnp3_object$destination_p = c$id$resp_p;
         if (c$dnp3_objects$function_code != "READ")
             return;
     }
     else{
         dnp3_object$function_code = c$dnp3_objects$function_code;
+        dnp3_object$source_h = c$id$resp_h;
+        dnp3_object$source_p = c$id$resp_p;
+        dnp3_object$destination_h = c$id$orig_h;
+        dnp3_object$destination_p = c$id$orig_p;
         if (c$dnp3_objects$function_code != "RESPONSE")
             return;
         dnp3_object$object_count = number;
