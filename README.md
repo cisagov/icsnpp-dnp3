@@ -154,6 +154,20 @@ The table below shows an example of these fields in the log files. The first log
 | 192.168.1.10 | 47785     | 192.168.1.200 | 502       | T       | 192.168.1.10  | 47785    | 192.168.1.200 | 502           |
 | 192.168.1.10 | 47785     | 192.168.1.200 | 502       | F       | 192.168.1.200 | 502      | 192.168.1.10  | 47785         |
 
+## Coverage
+
+See [Logging Capabilities](#logging-capabilities) for detailed information of the parser coverage.
+
+The DNP3 protocol contains a few vendor and product specific functions. These vendor/product specific functions are not included in this parser. All coverage details in this section include information and statistics based on the basic/default DNP3 protocol.
+
+### General/Header Logging
+
+The general log file for DNP3 (dnp3.log) is produced by Zeek's default DNP3 parser and is not modified by this parser extension.
+
+### Detailed Logging
+
+Detailed logging for 7 DNP3 functions are logged in the control log file (dnp3_control.log) and 2 DNP3 functions are logged in the objects log file (dnp3_objects.log). There are a total of 37 default DNP3 functions, however, 7 of these DNP3 functions do not contain any additional data to be logged. ~23% (7/30) of data containing default DNP3 functions contain detailed logging.
+
 ## ICSNPP Packages
 
 All ICSNPP Packages:
