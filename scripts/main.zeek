@@ -78,7 +78,7 @@ event zeek_init() &priority=5 {
 }
 
 ###################################################################################################
-##################  Initializes the dnp3_control object for a new control event ###################
+#########################  Saves prefix_value to DNP3 connection object  ##########################
 ###################################################################################################
 event dnp3_object_prefix(c: connection, 
                          is_orig: bool, 
@@ -88,15 +88,6 @@ event dnp3_object_prefix(c: connection,
         c$dnp3_control = [$ts=network_time(), $uid=c$uid, $id=c$id];
     
     c$dnp3_control$index_number = prefix_value;
-
-    # Reset fields for new data
-    delete c$dnp3_control$block_type;
-    delete c$dnp3_control$trip_control_code;
-    delete c$dnp3_control$operation_type;
-    delete c$dnp3_control$execute_count;
-    delete c$dnp3_control$on_time;
-    delete c$dnp3_control$off_time;
-    delete c$dnp3_control$status_code;
 }
 
 ###################################################################################################
@@ -167,8 +158,11 @@ event dnp3_crob(c: connection,
     c$dnp3_control$on_time = on_time;
     c$dnp3_control$off_time = off_time;
 
-    if (c$dnp3_control$function_code == "RESPONSE")
+    if (c$dnp3_control$function_code == "RESPONSE") {
         c$dnp3_control$status_code = control_block_status_codes[status_code];    
+    } else {
+        delete c$dnp3_control$status_code;
+    }
 
     Log::write(LOG_CONTROL, c$dnp3_control);
 }
@@ -210,8 +204,11 @@ event dnp3_pcb(c: connection,
     c$dnp3_control$on_time = on_time;
     c$dnp3_control$off_time = off_time;
 
-    if (c$dnp3_control$function_code == "RESPONSE")
-        c$dnp3_control$status_code = control_block_status_codes[status_code];
+    if (c$dnp3_control$function_code == "RESPONSE") {
+        c$dnp3_control$status_code = control_block_status_codes[status_code];    
+    } else {
+        delete c$dnp3_control$status_code;
+    }
 
     Log::write(LOG_CONTROL, c$dnp3_control);
 }
