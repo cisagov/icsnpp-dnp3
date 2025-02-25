@@ -166,7 +166,9 @@ event dnp3_crob(c: connection,
     c$dnp3_control$execute_count = count8;
     c$dnp3_control$on_time = on_time;
     c$dnp3_control$off_time = off_time;
-    c$dnp3_control$status_code = control_block_status_codes[status_code];    
+
+    if (c$dnp3_control$function_code == "RESPONSE")
+        c$dnp3_control$status_code = control_block_status_codes[status_code];    
 
     Log::write(LOG_CONTROL, c$dnp3_control);
 }
@@ -207,7 +209,9 @@ event dnp3_pcb(c: connection,
     c$dnp3_control$execute_count = count8;
     c$dnp3_control$on_time = on_time;
     c$dnp3_control$off_time = off_time;
-    c$dnp3_control$status_code = control_block_status_codes[status_code];
+
+    if (c$dnp3_control$function_code == "RESPONSE")
+        c$dnp3_control$status_code = control_block_status_codes[status_code];
 
     Log::write(LOG_CONTROL, c$dnp3_control);
 }
