@@ -79,6 +79,7 @@ This log file contains all the relevant data for these SELECT and OPERATE comman
 | index_number          | count     | Object index number                                           |
 | trip_control_code     | string    | Nul, Close, or Trip                                           |
 | operation_type        | string    | Nul, Pulse_On, Pulse_Off, Latch_On, Latch_Off                 |
+| clear_bit             | bool      | Control code clear bit set (T) or unset (F)                   |
 | execute_count         | count     | Number of times to execute                                    |
 | on_time               | count     | On time                                                       |
 | off_time              | count     | Off time                                                      |
