@@ -65,7 +65,7 @@ redef record connection += {
 };
 
 ###################################################################################################
-#################  Defines Log Streams for dnp3_control.log, and dnp3_objects.log  ################
+#################  Defines Log Streams for dnp3_control.log and dnp3_objects.log  #################
 ###################################################################################################
 event zeek_init() &priority=5 {
     Log::create_stream(DNP3_Extended::LOG_CONTROL, [$columns=Control, 
@@ -98,14 +98,10 @@ event dnp3_application_request_header(c: connection,
                                       application_control: count, 
                                       fc: count) &priority=2{
 
-    if ( ! c?$dnp3_control )
-        c$dnp3_control = [$ts=network_time(), $uid=c$uid, $id=c$id];
-
+    c$dnp3_control = [$ts=network_time(), $uid=c$uid, $id=c$id];
     c$dnp3_control$function_code = function_codes[fc];
 
-    if ( ! c?$dnp3_objects )
-        c$dnp3_objects = [$ts=network_time(), $uid=c$uid, $id=c$id];
-
+    c$dnp3_objects = [$ts=network_time(), $uid=c$uid, $id=c$id];
     c$dnp3_objects$function_code = function_codes[fc];
 }
 
@@ -117,14 +113,11 @@ event dnp3_application_response_header(c: connection,
                                        application_control: count, 
                                        fc: count, 
                                        iin: count) &priority=2{
-    if ( ! c?$dnp3_control )
-        c$dnp3_control = [$ts=network_time(), $uid=c$uid, $id=c$id];
 
+    c$dnp3_control = [$ts=network_time(), $uid=c$uid, $id=c$id];
     c$dnp3_control$function_code = function_codes[fc];
 
-    if ( ! c?$dnp3_objects )
-        c$dnp3_objects = [$ts=network_time(), $uid=c$uid, $id=c$id];
-
+    c$dnp3_objects = [$ts=network_time(), $uid=c$uid, $id=c$id];
     c$dnp3_objects$function_code = function_codes[fc];
 }
 
@@ -164,13 +157,14 @@ event dnp3_crob(c: connection,
     c$dnp3_control$execute_count = count8;
     c$dnp3_control$on_time = on_time;
     c$dnp3_control$off_time = off_time;
-    c$dnp3_control$status_code = control_block_status_codes[status_code];    
+
+    if (c$dnp3_control$function_code == "RESPONSE") {
+        c$dnp3_control$status_code = control_block_status_codes[status_code];    
+    } else {
+        delete c$dnp3_control$status_code;
+    }
 
     Log::write(LOG_CONTROL, c$dnp3_control);
-
-    if ( !is_orig ){
-        delete c$dnp3_control;
-    }
 }
 
 ###################################################################################################
@@ -209,13 +203,14 @@ event dnp3_pcb(c: connection,
     c$dnp3_control$execute_count = count8;
     c$dnp3_control$on_time = on_time;
     c$dnp3_control$off_time = off_time;
-    c$dnp3_control$status_code = control_block_status_codes[status_code];
+
+    if (c$dnp3_control$function_code == "RESPONSE") {
+        c$dnp3_control$status_code = control_block_status_codes[status_code];    
+    } else {
+        delete c$dnp3_control$status_code;
+    }
 
     Log::write(LOG_CONTROL, c$dnp3_control);
-
-    if ( !is_orig ){
-        delete c$dnp3_control;
-    }
 }
 
 ###################################################################################################
