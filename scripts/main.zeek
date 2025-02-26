@@ -31,6 +31,7 @@ export {
         index_number            : count     &optional &log;   # Object Index #
         trip_control_code       : string    &optional &log;   # Nul, Close, or Trip
         operation_type          : string    &optional &log;   # Nul, Pulse_On, Pulse_Off, Latch_On, Latch_Off
+        clear_bit               : bool      &optional &log;   # Control code clear bit set (T) or unset (F)
         execute_count           : count     &optional &log;   # Number of times to execute
         on_time                 : count     &optional &log;   # On Time
         off_time                : count     &optional &log;   # Off Time
@@ -154,6 +155,7 @@ event dnp3_crob(c: connection,
     c$dnp3_control$block_type = "Control Relay Output Block";
     c$dnp3_control$trip_control_code = control_block_trip_code[((control_code & 0xc0)/64)];
     c$dnp3_control$operation_type = control_block_operation_type[(control_code & 0xf)];
+    c$dnp3_control$clear_bit = ((control_code & 0x20) >> 5) == 1;
     c$dnp3_control$execute_count = count8;
     c$dnp3_control$on_time = on_time;
     c$dnp3_control$off_time = off_time;
@@ -200,6 +202,7 @@ event dnp3_pcb(c: connection,
     c$dnp3_control$block_type = "Pattern Control Block";
     c$dnp3_control$trip_control_code = control_block_trip_code[((control_code & 0xc0)/64)];
     c$dnp3_control$operation_type = control_block_operation_type[(control_code & 0xf)];
+    c$dnp3_control$clear_bit = ((control_code & 0x20) >> 5) == 1;
     c$dnp3_control$execute_count = count8;
     c$dnp3_control$on_time = on_time;
     c$dnp3_control$off_time = off_time;
