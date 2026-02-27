@@ -18,24 +18,24 @@ export {
     ################################  Control -> dnp3_control.log  ################################
     ###############################################################################################
     type Control: record {
-        ts                      : time      &log;             # Timestamp of event
-        uid                     : string    &log;             # Zeek unique ID for connection
-        id                      : conn_id   &log;             # Zeek connection struct (addresses and ports)
-        is_orig                 : bool      &optional &log;   # the message came from the originator/client or the responder/server
-        source_h                : addr      &optional &log;   # Source IP Address
-        source_p                : port      &optional &log;   # Source Port
-        destination_h           : addr      &optional &log;   # Destination IP Address
-        destination_p           : port      &optional &log;   # Destination Port
-        block_type              : string    &optional &log;   # Control_Relay_Output_Block or Pattern_Control_Block
-        function_code           : string    &optional &log;   # Function Code (SELECT, OPERATE, RESPONSE)
-        index_number            : count     &optional &log;   # Object Index #
-        trip_control_code       : string    &optional &log;   # Nul, Close, or Trip
-        operation_type          : string    &optional &log;   # Nul, Pulse_On, Pulse_Off, Latch_On, Latch_Off
-        clear_bit               : bool      &optional &log;   # Control code clear bit set (T) or unset (F)
-        execute_count           : count     &optional &log;   # Number of times to execute
-        on_time                 : count     &optional &log;   # On Time
-        off_time                : count     &optional &log;   # Off Time
-        status_code             : string    &optional &log;   # Status Code (see control_block_status_codes)
+        ts                      : time      &log;             ##< Timestamp of event
+        uid                     : string    &log;             ##< Zeek unique ID for connection
+        id                      : conn_id   &log;             ##< Zeek connection struct (addresses and ports)
+        is_orig                 : bool      &optional &log;   ##< the message came from the originator/client or the responder/server
+        source_h                : addr      &optional &log;   ##< Source IP Address
+        source_p                : port      &optional &log;   ##< Source Port
+        destination_h           : addr      &optional &log;   ##< Destination IP Address
+        destination_p           : port      &optional &log;   ##< Destination Port
+        block_type              : string    &optional &log;   ##< Control_Relay_Output_Block or Pattern_Control_Block
+        function_code           : string    &optional &log;   ##< Function Code (SELECT, OPERATE, RESPONSE)
+        index_number            : count     &optional &log;   ##< Object Index #
+        trip_control_code       : string    &optional &log;   ##< Nul, Close, or Trip
+        operation_type          : string    &optional &log;   ##< Nul, Pulse_On, Pulse_Off, Latch_On, Latch_Off
+        clear_bit               : bool      &optional &log;   ##< Control code clear bit set (T) or unset (F)
+        execute_count           : count     &optional &log;   ##< Number of times to execute
+        on_time                 : count     &optional &log;   ##< On Time
+        off_time                : count     &optional &log;   ##< Off Time
+        status_code             : string    &optional &log;   ##< Status Code (see control_block_status_codes)
     };
     global log_control: event(rec: Control);
 
@@ -43,19 +43,19 @@ export {
     ################################  Objects -> dnp3_objects.log  ################################
     ###############################################################################################
     type Objects: record {
-        ts                      : time      &log;             # Timestamp of event
-        uid                     : string    &log;             # Zeek unique ID for connection
-        id                      : conn_id   &log;             # Zeek connection struct (addresses and ports)
-        is_orig                 : bool      &optional &log;   # the message came from the originator/client or the responder/server
-        source_h                : addr      &optional &log;   # Source IP Address
-        source_p                : port      &optional &log;   # Source Port
-        destination_h           : addr      &optional &log;   # Destination IP Address
-        destination_p           : port      &optional &log;   # Destination Port
-        function_code           : string    &optional &log;   # Function Code (READ or RESPONSE)
-        object_type             : string    &optional &log;   # Object type (see dnp3_objects)
-        object_count            : count     &optional &log;   # Number of objects
-        range_low               : count     &optional &log;   # Range (Low) of object
-        range_high              : count     &optional &log;   # Range (High) of object
+        ts                      : time      &log;             ##< Timestamp of event
+        uid                     : string    &log;             ##< Zeek unique ID for connection
+        id                      : conn_id   &log;             ##< Zeek connection struct (addresses and ports)
+        is_orig                 : bool      &optional &log;   ##< the message came from the originator/client or the responder/server
+        source_h                : addr      &optional &log;   ##< Source IP Address
+        source_p                : port      &optional &log;   ##< Source Port
+        destination_h           : addr      &optional &log;   ##< Destination IP Address
+        destination_p           : port      &optional &log;   ##< Destination Port
+        function_code           : string    &optional &log;   ##< Function Code (READ or RESPONSE)
+        object_type             : string    &optional &log;   ##< Object type (see dnp3_objects)
+        object_count            : count     &optional &log;   ##< Number of objects
+        range_low               : count     &optional &log;   ##< Range (Low) of object
+        range_high              : count     &optional &log;   ##< Range (High) of object
     };
     global log_objects: event(rec: Objects);
 }
