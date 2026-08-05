@@ -23,7 +23,7 @@ For additional information on these log files, see the *Logging Capabilities* se
 
 ### Package Manager
 
-This script is available as a package for [Zeek Package Manger](https://docs.zeek.org/projects/package-manager/en/stable/index.html)
+This script is available as a package for the [Zeek Package Manager](https://docs.zeek.org/projects/package-manager/en/stable/index.html)
 
 ```bash
 zkg refresh
@@ -37,7 +37,7 @@ If users are not using site/local.zeek or another site installation of Zeek and 
 
 ```bash
 git clone https://github.com/cisagov/icsnpp-dnp3.git
-zeek -Cr icsnpp-dnp3/tests/traces/dnp3_example.pcap icsnpp-dnp3
+zeek -Cr icsnpp-dnp3/testing/traces/dnp3_example.pcap icsnpp-dnp3
 ```
 
 ### Manual Install
@@ -50,12 +50,12 @@ zeek_install_dir=$(dirname $(dirname `which zeek`))
 cp -r icsnpp-dnp3/scripts/ $zeek_install_dir/share/zeek/site/icsnpp-dnp3
 ```
 
-If using a site deployment, simply add echo `@load icsnpp-dnp3` to the local.site file.
+If using a site deployment, simply add `@load icsnpp-dnp3` to the `local.zeek` file.
 
 If users are not using site/local.zeek or another site installation of Zeek, and want to run this package on a packet capture, they can add `icsnpp-dnp3` to the command to run this plugin's scripts on the packet capture:
 
 ```bash
-zeek -Cr icsnpp-dnp3/tests/traces/dnp3_example.pcap icsnpp-dnp3
+zeek -Cr icsnpp-dnp3/testing/traces/dnp3_example.pcap icsnpp-dnp3
 ```
 ## Logging Capabilities
 
@@ -92,7 +92,7 @@ This log file contains all the relevant data for these SELECT and OPERATE comman
 | off_time              | count     | Off time                                                      |
 | status_code           | string    | Status code                                                   |
 
-### DNP3 Read Object Log (dnp3_read_objects.log)
+### DNP3 Read Object Log (dnp3_objects.log)
 
 #### Overview
 
@@ -155,7 +155,7 @@ if is_orig == False
 
 #### Example
 
-The table below shows an example of these fields in the log files. The first log in the table represents a Modbus request from 192.168.1.10 -> 192.168.1.200 and the second log represents a Modbus reply from 192.168.1.200 -> 192.168.1.10. As shown in the table below, the `id` structure lists both packets as having the same originator and responder, but the `source` and `destination` fields reflect the true source and destination of these packets.
+The table below shows an example of these fields in the log files. The first log in the table represents a DNP3 request from 192.168.1.10 -> 192.168.1.200 and the second log represents a DNP3 reply from 192.168.1.200 -> 192.168.1.10. As shown in the table below, the `id` structure lists both packets as having the same originator and responder, but the `source` and `destination` fields reflect the true source and destination of these packets.
 
 | id.orig_h    | id.orig_p | id.resp_h     | id.resp_p | is_orig | source_h      | source_p | destination_h | destination_p |
 | ------------ | --------- |---------------|-----------|---------|---------------|----------|---------------|-------------- |
@@ -174,7 +174,47 @@ The general log file for DNP3 (dnp3.log) is produced by Zeek's default DNP3 pars
 
 ### Detailed Logging
 
-Detailed logging for 7 DNP3 functions are logged in the control log file (dnp3_control.log) and 2 DNP3 functions are logged in the objects log file (dnp3_objects.log). There are a total of 37 default DNP3 functions, however, 7 of these DNP3 functions do not contain any additional data to be logged. ~23% (7/30) of data containing default DNP3 functions contain detailed logging.
+Detailed logging is provided for 5 DNP3 functions in the control log file (dnp3_control.log) and for 2 DNP3 functions in the objects log file (dnp3_objects.log). Because Response is logged in both files, 6 distinct DNP3 functions have detailed logging. There are a total of 37 default DNP3 functions; however, 7 of these functions do not contain any additional data to be logged. Therefore, 20% (6/30) of the data-containing default DNP3 functions have detailed logging.
+
+| Function                      | Logging Level        |
+| ----------------------------- | -------------------- |
+| Confirm                       | Logged - Header Only |
+| Read                          | Logged - Full        |
+| Write                         | Logged - Header Only |
+| Select                        | Logged - Full        |
+| Operate                       | Logged - Full        |
+| Direct Operate                | Logged - Full        |
+| Direct Operate No ACK         | Logged - Full        |
+| Immediate Freeze              | Logged - Header Only |
+| Immediate Freeze No ACK       | Logged - Header Only |
+| Freeze and Clear              | Logged - Header Only |
+| Freeze and Clear No ACK       | Logged - Header Only |
+| Freeze with Time              | Logged - Header Only |
+| Freeze with Time No ACK       | Logged - Header Only |
+| Cold Restart                  | Logged - Header Only |
+| Warm Restart                  | Logged - Header Only |
+| Initialize Data               | Logged - Header Only |
+| Initialize Application        | Logged - Header Only |
+| Start Application             | Logged - Header Only |
+| Stop Application              | Logged - Header Only |
+| Save Configuration            | Logged - Header Only |
+| Enable Unsolicited Message    | Logged - Header Only |
+| Disable Unsolicited Message   | Logged - Header Only |
+| Assign Classes                | Logged - Header Only |
+| Delay Measurement             | Logged - Header Only |
+| Record Current Time           | Logged - Header Only |
+| Open File                     | Logged - Header Only |
+| Close File                    | Logged - Header Only |
+| Delete File                   | Logged - Header Only |
+| Get File Info                 | Logged - Header Only |
+| Authenticate File             | Logged - Header Only |
+| Abort File                    | Logged - Header Only |
+| Activate Config               | Logged - Header Only |
+| Authentication Request        | Logged - Header Only |
+| Authentication Request No ACK | Logged - Header Only |
+| Response                      | Logged - Full        |
+| Unsolicited Response          | Logged - Header Only |
+| Authentication Response       | Logged - Header Only |
 
 ## ICSNPP Packages
 
