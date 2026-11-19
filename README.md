@@ -13,9 +13,10 @@ Industrial Control Systems Network Protocol Parsers (ICSNPP) - DNP3.
 
 ICSNPP-DNP3 is a Zeek package that extends the logging capabilities of Zeek's default DNP3 protocol parser.
 
-Zeek's default DNP3 parser logs DNP3 traffic to dnp3.log. This log file remains unchanged. This package extends DNP3 logging capability by adding two new DNP3 log files:
+Zeek's default DNP3 parser logs DNP3 traffic to dnp3.log. This log file remains unchanged. This package extends DNP3 logging capability by adding three new DNP3 log files:
 * dnp3_control.log
 * dnp3_objects.log
+* dnp3_point_values.log
 
 For additional information on these log files, see the *Logging Capabilities* section below.
 
@@ -117,6 +118,35 @@ DNP3 READ-RESPONSE commands are very common DNP3 commands and these responses co
 | object_count          | count     | Number of objects                                             |
 | range_low             | count     | Range (low) of object                                         |
 | range_high            | count     | Range (high) of object                                        |
+
+### DNP3 Point Values Log (dnp3_point_values.log)
+
+#### Overview
+
+This log captures the measured values of the DNP3 analog input and counter points that Zeek's DNP3 parser decodes, and logs one entry per point to **dnp3_point_values.log**.
+
+It covers counters (group 20), frozen counters (group 21), analog inputs (group 30), frozen analog inputs (group 31), analog input change events (group 32) and frozen analog input change events (group 33), in every variation for which Zeek's parser raises a value event. Binary input (group 1) and binary output (group 10) states are not logged in this change: Zeek delivers them only through the generic `dnp3_response_data_object` event, as a raw byte for variation 1 (where states are bit-packed) and as the flag octet for variation 2, which needs per-bit unpacking and is left for a follow-up. Zeek raises no typed value events for analog outputs (groups 40 and 41), counter events (groups 22 and 23) or delta counter variations, so those points are not logged either.
+
+Signed 16 and 32 bit values are logged as signed numbers, and single and double precision floating point values are logged as their decimal value. The point index is taken from the index prefix when the object header's qualifier carries one, and otherwise from the start of the object header's range plus the point's position in that range.
+
+#### Fields Captured
+
+| Field                 | Type      | Description                                                   |
+| --------------------- |-----------|---------------------------------------------------------------|
+| ts                    | time      | Timestamp                                                     |
+| uid                   | string    | Unique ID for this connection                                 |
+| id                    | conn_id   | Default Zeek connection info (IP addresses, ports)            |
+| is_orig               | bool      | True if the packet is sent from the originator                |
+| source_h              | address   | Source IP address (see *Source and Destination Fields*)       |
+| source_p              | port      | Source port (see *Source and Destination Fields*)             |
+| destination_h         | address   | Destination IP address (see *Source and Destination Fields*)  |
+| destination_p         | port      | Destination port (see *Source and Destination Fields*)        |
+| function_code         | string    | Function code (e.g. RESPONSE, UNSOLICITED_RESPONSE)           |
+| object_type           | string    | DNP3 object type                                              |
+| point_index           | count     | Point index                                                   |
+| flag                  | count     | Flag octet, when the object variation carries one             |
+| value                 | double    | Point value                                                   |
+| point_time            | time      | Time of the value, when the object variation carries one      |
 
 ### Source and Destination Fields
 
